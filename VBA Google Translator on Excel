@@ -1,0 +1,80 @@
+# Google Translation on Excel
+
+Function Translate(Range("") -> Translate to strToTargetLanguage
+Alt + F11 -> check the code
+
+Public Function Translate(rngC As Range) As String
+'''Internet Control / Html Library / XML 6.0
+    Dim html                    As New HTMLDocument
+    Dim http                    As New XMLHTTP60
+    Dim strURL                  As String
+    Dim strText                 As String
+    Dim i                       As Long
+    Dim strToTargetLanguage     As String
+    Dim strFromSourceLanguage   As String
+    Dim strInput                As String
+    Dim strTranslated           As String
+    Dim objDivs, objDiv         As Object
+
+    strInput = ENCODEURL(rngC.Text)
+
+    strFromSourceLanguage = "auto"
+    strToTargetLanguage = "en"
+
+
+    strURL = "https://translate.google.com/m?hl=" & strToTargetLanguage & _
+        "&sl=" & strFromSourceLanguage & _
+        "&tl=" & strToTargetLanguage & _
+        "&ie=UTF-8&prev=_m&q="
+
+    http.Open "GET", strURL & strInput, False
+    http.setRequestHeader "User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)"
+    http.send
+
+    html.body.innerHTML = http.responseText
+
+    Set objDivs = html.getElementsByTagName("div")
+
+
+
+    For Each objDiv In objDivs
+
+        If objDiv.className = "result-container" Then
+            strTranslated = objDiv.innerText
+            Translate = strTranslated
+        End If
+
+    Next objDiv
+
+    Set html = Nothing
+    Set http = Nothing
+
+End Function
+
+Function ENCODEURL(varText As Variant, Optional blnEncode = True)
+
+'############################################################
+'한글/영문 텍스트를 URL 주소로 변경합니다.
+'https://www.oppadu.com/vba-encodeurl-함수/
+'############################################################
+
+Static objHtmlfile As Object
+
+If objHtmlfile Is Nothing Then
+    Set objHtmlfile = CreateObject("htmlfile")
+    With objHtmlfile.parentWindow
+    .execScript "function encode(s) {return encodeURIComponent(s)}", "jscript"
+    End With
+End If
+
+If blnEncode Then
+    ENCODEURL = objHtmlfile.parentWindow.encode(varText)
+End If
+
+End Function
+
+
+
+
+
+
